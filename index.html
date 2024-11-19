@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recherche d'Images</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: #f4f4f9;
+    }
+    .search-container {
+      margin: 20px;
+      text-align: center;
+    }
+    input[type="text"] {
+      width: 300px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 20px;
+      margin-left: 10px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .images {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 20px;
+      gap: 10px;
+    }
+    .images img {
+      width: 200px;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="search-container">
+    <h2>Recherche d'Images</h2>
+    <input type="text" id="searchInput" placeholder="Tapez un mot-clé..." />
+    <button onclick="searchImages()">Rechercher</button>
+  </div>
+  <div class="images" id="imagesContainer"></div>
+
+  <script>
+    async function searchImages() {
+      const query = document.getElementById('searchInput').value.trim();
+      const imagesContainer = document.getElementById('imagesContainer');
+      imagesContainer.innerHTML = ''; // Effacer les résultats précédents
+
+      if (!query) {
+        alert('Veuillez entrer un mot-clé pour rechercher des images.');
+        return;
+      }
+
+      const apiKey = 'YOUR_UNSPLASH_API_KEY'; // Remplacez par votre clé API Unsplash
+      const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&client_id=${apiKey}&per_page=12`;
+
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.results.length === 0) {
+          imagesContainer.innerHTML = '<p>Aucune image trouvée.</p>';
+          return;
+        }
+
+        // Utilisation des URLs dans data.results pour afficher les images
+        data.results.forEach(image => {
+          const img = document.createElement('img');
+          img.src = image.urls.small; // URL pour une petite image
+          img.alt = image.alt_description || 'Image';
+          imagesContainer.appendChild(img);
+        });
+      } catch (error) {
+        console.error('Erreur lors de la recherche d\'images :', error);
+        imagesContainer.innerHTML = '<p>Une erreur est survenue. Veuillez réessayer plus tard.</p>';
+      }
+    }
+  </script>
+</body>
+</html>
